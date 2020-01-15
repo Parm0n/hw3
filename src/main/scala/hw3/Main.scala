@@ -1,13 +1,109 @@
 package hw3
 
-object Main {
-  def standardDeviation(vector: List[Double]): Double = ???
+import scala.collection.mutable
+//package scala.math.sqrt
 
-  def letterFrequencyRanking(corpus: String): String = ???
+object Main {
+  def standardDeviation(vector: List[Double]): Double = {
+    var sum : Double = 0
+    for(it <- vector){
+      sum += it
+    }
+    val avg: Double = sum / vector.size
+    var avgL: List[Double] = List()
+
+    for(it <- vector){
+      avgL = avgL :+ (it - avg) * (it - avg)
+    }
+
+    var sumA : Double = 0
+    for(it <- avgL){
+      sumA += it
+    }
+
+    val avgA: Double = sumA / vector.size
+    val stddev: Double = scala.math.sqrt(avgA)
+    stddev
+  }
+
+  def findMax(inpt: List[(Char, Int)]): (Char, List[(Char, Int)]) = {
+    var max: Int = 0
+    var res: (Char, Int) = (' ', 0)
+    var l: List[(Char, Int)] = inpt
+    for(it <- inpt){
+      if(it._2 > max)
+        max = it._2
+    }
+    for(it <- l){
+      if(it._2 == max){
+        res = it
+        max = -1
+      }
+    }
+    l = l.filter(_ != (res))
+
+    (res._1, l)
+  }
+
+  def letterFrequencyRanking(corpus: String): String = {
+    var lets: List[Char] = List()
+
+    for(it <- corpus){
+      if(it.isLetter)
+      lets = lets :+ it.toLower
+    }
+
+    lets = lets.sorted
+
+
+    var letters: List[(Char, Int)] = List()
+
+    for(it <- lets){
+      var flag: Boolean = false
+      for(i <- 0 to letters.size - 1){
+        if(it == letters(i)._1){
+          flag = true
+          letters = letters.updated(i, (letters(i)._1, letters(i)._2 + 1))
+        }
+      }
+      if(!flag){
+        letters = letters :+ (it, 1)
+      }
+
+    }
+
+    var res: String = ""
+
+    while(letters.size > 0){
+      var localRes: (Char, List[(Char, Int)])  = findMax(letters)
+
+      res += localRes._1
+      letters = localRes._2
+    }
+
+    res
+  }
 
   def romanji(katakana: String): String = ???
 
-  def gray(bits: Int): List[String] = ???
+
+  def gray(bits: Int): List[String] = {
+    var grays : Map[Int,List[String]] = Map()
+    grays.get(bits) match {
+         case Some(res) => res
+           case _ =>
+             val res = bits match {
+             case 0 => Nil
+                 case 1 => List("0","1")
+                 case _ =>
+                   val others = gray(bits-1)
+                   val reflected = others.reverse
+                   others.map("0" + _) ++ reflected.map("1" + _)
+           }
+             grays = grays + (bits -> res)
+             res
+           }
+  }
 }
 
 object Katakana {
